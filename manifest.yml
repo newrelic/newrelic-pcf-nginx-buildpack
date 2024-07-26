@@ -8,10 +8,8 @@ default_versions:
 version_lines:
   newrelic-infra:
     mainline: 1.53.0
-    stable: 1.54.0
   newrelic-nginx:
     mainline: 3.4.6
-    stable: 3.5.0
 dependency_deprecation_dates:
 dependencies:
 - name: newrelic-infra
