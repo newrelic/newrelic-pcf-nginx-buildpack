@@ -75,11 +75,11 @@ If you prefer not to install the tile, you can alternatively unzip the downloade
 
 7. Upload the zipped buildpack file using the CF CLI's **"cf create-buildpack"** command:
     ```sh
-    cf create-buildpack newrelic_nginx_buildpack newrelic_nginx_buildpack-cached-cflinuxfs4-v1.0.6.zip 99
+    cf create-buildpack newrelic_nginx_buildpack newrelic_nginx_buildpack-cached-cflinuxfs4-v*.zip 99
     ```
     OR
     ```sh
-    cf create-buildpack newrelic_nginx_buildpack newrelic_nginx_buildpack-cached-cflinuxfs3-v1.0.6.zip 99
+    cf create-buildpack newrelic_nginx_buildpack newrelic_nginx_buildpack-cached-cflinuxfs3-v*.zip 99
     ```
 
 ## <a id='buildpack-build-deploy'></a> Buildpack Build and Deploy Process
@@ -106,12 +106,21 @@ The buildpacks in this tile are pre-built and ready for use in Cloud Foundry. Ho
     make clean
     make package
     ```
-    OR
+    Following buildpacks will be generated:
+   
+    - build/newrelic_nginx_buildpack-cached-cflinuxfs4-v*.zip
+    - build/newrelic_nginx_buildpack-cached-cflinuxfs3-v*.zip
+
+   OR
+   
     Build the buildpack and create a tile:
     ```sh
     make clean
     make all
     ```
+
+   Following tile will be generated:
+   - product/newrelic-pcf-nginx-buildpack-*.pivotal
 
 ### <a id='deploy'></a> Deploy
 
@@ -121,11 +130,11 @@ To deploy and use the buildpack in Cloud Foundry:
     ```sh
     cf create-buildpack newrelic_nginx_buildpack [BUILDPACK_ZIP_FILE_PATH] 99
     ```
-2. Create a folder named `example` and download the `examples.zip` archive:
+2. Create a folder named `example` and download the `example.zip` archive:
     ```sh
     mkdir example
     cd example
-    wget https://github.com/newrelic/newrelic-pcf-nginx-buildpack/releases/examples.zip
+    wget https://github.com/newrelic/newrelic-pcf-nginx-buildpack/releases/example.zip
     ```
 
 ### Example Directory
