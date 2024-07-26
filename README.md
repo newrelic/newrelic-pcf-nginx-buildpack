@@ -224,7 +224,7 @@ Once the application is successfully pushed, the New Relic Nginx integration wil
 
 To install the dashboard, click [here](https://one.newrelic.com/catalog-pack-details?state=952adb8f-8cd8-17ec-a55e-2a470ff27b54). You should skip the installation and directly install the dashboard.
 
-<img width="1905" alt="image" src="https://github.com/user-attachments/assets/a71c3559-278a-4c21-90a0-13390107b81d">
+<img width="962" alt="image" src="https://github.com/user-attachments/assets/bb88156c-4e9f-4ad1-80dd-da2778ed57fa">
 
 You may also explore data further under "All entities" → "On Hosts" → "NGINX Servers."
 
