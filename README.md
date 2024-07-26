@@ -49,6 +49,7 @@ The following table provides version and version-support information about the N
 | **VMware Tanzu OpsManager** | 3.0.x |
 | **Tanzu Application Service** | 5.0.x and 6.0.x |
 | **BOSH stemcell version** | Ubuntu Jammy |
+| **CF Stack** | cflinuxfs3, cflinuxfs4 |
 
 ---
 
