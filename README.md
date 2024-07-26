@@ -22,6 +22,43 @@
 
 The New Relic Nginx Integration Buildpack for VMware Tanzu enables seamless monitoring and troubleshooting of your NGINX server. This buildpack collects and sends comprehensive data, including inventory and metrics, to the New Relic platform. This integration provides valuable insights into connections and client requests, allowing for quick issue identification and resolution. Additionally, you can correlate this data with VMware Tanzu infrastructure metrics and events collected by the [New Relic Firehose Nozzle](https://support.broadcom.com/group/ecx/productdownloads?subfamily=New%20Relic%20Nozzle%20for%20VMware%20Tanzu), gaining a complete understanding of your environment and streamlining your troubleshooting process.
 
+
+### Requirements
+
+The New Relic Nginx Integration Buildpack for VMware Tanzu requires the following:
+
+1. **cf CLI**: Version 6.38 or later is needed as this buildpack is installed as a multi-buildpack in the app manifest.
+2. **Nginx Buildpack**: This buildpack must be installed on top of the nginx_buildpack.
+3. **New Relic Account**: An active New Relic account with a license key is required. This key is used to bind Nginx servers to the New Relic infrastructure agent, which transmits metrics to the New Relic Platform.
+
+For general information about adding multiple buildpacks to manifests, see [Pushing an Application with Multiple Buildpacks](https://docs.cloudfoundry.org/buildpacks/use-multiple-buildpacks.html) in the Cloud Foundry documentation.
+
+Here's the table converted for a ReadMe.md file using Markdown:
+
+---
+
+## Version and Support Information
+
+The following table provides version and version-support information about the New Relic Nginx Integration Buildpack for VMware Tanzu.
+
+| Element | Details |
+|---------|---------|
+| **Tile version** | 1.0.1 |
+| **Release date** | July 31, 2024 |
+| **Software component version** | New Relic Nginx Integration Buildpack for VMware Tanzu 1.0.1 |
+| **VMware Tanzu OpsManager** | 3.0.x |
+| **Tanzu Application Service** | 5.0.x and 6.0.x |
+| **BOSH stemcell version** | Ubuntu Jammy |
+
+---
+
+## Feedback [#feedback]
+
+If you have a feature request, questions, or information about a bug, please submit an issue on [github](https://github.com/newrelic/newrelic-nginx-buildpack-tile/issues).
+
+---
+
+
 ## Installation and Configuration
 
 This section describes how to install and configure the New Relic Nginx Integration Buildpack for VMware Tanzu.
@@ -29,7 +66,7 @@ This section describes how to install and configure the New Relic Nginx Integrat
 You can install the buildpacks either as a tile in Ops Manager or individually using the CF CLI.
 
 ### <a id='install-opsmgr'></a> Install and Configure New Relic Nginx Integration Buildpack as a Tile in Ops Manager
-
+---
 1. Download the latest version of the tile (currently **"newrelic-nginx-buildpack-1.0.1.pivotal"**) from the [Broadcom download site](https://support.broadcom.com/group/ecx/productdownloads?subfamily=New%20Relic%20Nginx%20Integration%20Buildpack%20for%20VMware%20Tanzu), or from New Relic's [GitHub repo under releases](https://github.com/newrelic/newrelic-pcf-nginx-buildpack/releases).
 2. Navigate to the Ops Manager Installation Dashboard and click **Import a Product** to upload the product file.
 3. Under the **Import a Product** button, click the **"+"** sign next to the version number of **New Relic Nginx Buildpack for Tanzu** to add the tile to your staging area.
@@ -40,7 +77,7 @@ You can install the buildpacks either as a tile in Ops Manager or individually u
 8. Click the blue button in the top-right corner of the Installation UI to **Apply changes**.
 
 ### <a id='install-buildpack'></a> Install and Configure Nginx Buildpack for Tanzu with CF CLI
-
+---
 If you prefer not to install the tile, you can alternatively unzip the downloaded **.pivotal** file and install the buildpacks using the CF CLI command **"cf create-buildpack ..."**.
 
 1. Unzip **"newrelic-nginx-buildpack-*.pivotal"** into a separate subdirectory:
@@ -85,7 +122,7 @@ If you prefer not to install the tile, you can alternatively unzip the downloade
 ## <a id='buildpack-build-deploy'></a> Buildpack Build and Deploy Process
 
 ### <a id='build'></a> Build
-
+---
 The buildpacks in this tile are pre-built and ready for use in Cloud Foundry. However, if you want to make changes or update the cached version of any buildpacks with newer dependencies, you can build your own copy. Follow the instructions below to build your own copy:
 
 1. Clone the buildpack repository to your system:
@@ -123,7 +160,7 @@ The buildpacks in this tile are pre-built and ready for use in Cloud Foundry. Ho
    - product/newrelic-pcf-nginx-buildpack-*.pivotal
 
 ### <a id='deploy'></a> Deploy
-
+---
 To deploy and use the buildpack in Cloud Foundry:
 
 1. Upload the buildpack to Cloud Foundry and optionally specify it by name using the CF CLI:
@@ -138,7 +175,7 @@ To deploy and use the buildpack in Cloud Foundry:
     ```
 
 ### Example Directory
-
+---
 The `example` directory contains various artifacts necessary for the buildpack. Below is a description of each artifact and related documentation for reference:
 
 ```
@@ -187,7 +224,7 @@ example/
   - **Note:** The `index.html` file is crucial as the default file served by Nginx.
 
 ### Additional Notes:
-
+---
 - Ensure all configuration files are updated according to the latest documentation and version requirements.
 - Proper configuration is essential for the correct functionality of the buildpack and the application it serves.
 
@@ -197,7 +234,7 @@ Finally, push the application using the `cf push` command by using the manifest.
     ```
 
 ### Optional: Binding Your Application to New Relic Broker Service
-
+---
 To integrate your application with the [New Relic Broker Service](https://docs.newrelic.com/docs/infrastructure/host-integrations/host-integrations-list/cloudfoundry-integrations/vmware-tanzu-service-broker-integration/), follow these steps:
 
 1. **Create a New Relic Service Instance:**
@@ -228,7 +265,7 @@ To integrate your application with the [New Relic Broker Service](https://docs.n
     ```
 
 ### Monitoring with New Relic
-
+---
 Once the application is successfully pushed, the New Relic Nginx integration will start sending NGINX metrics to New Relic.
 
 To install the dashboard, click [here](https://one.newrelic.com/catalog-pack-details?state=952adb8f-8cd8-17ec-a55e-2a470ff27b54). You should skip the installation and directly install the dashboard.
