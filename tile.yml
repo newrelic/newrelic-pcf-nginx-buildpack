@@ -1,0 +1,241 @@
+name: newrelic-pcf-nginx-buildpack
+version: 1.0.1
+metadata_version: 2.0
+label: New Relic Nginx Buildpack for Tanzu
+description: New Relic Nginx Integration Buildpack for VMware Tanzu
+icon_file: resources/images/NR_logo.png
+
+stemcell_criteria:
+  os: 'ubuntu-jammy'
+  version: '1.181'
+
+forms:
+- name: buildpack-selection-properties
+  label: New Relic Buildpack Selection
+  description: Select which buildpack extensions to install 
+  properties:
+  # --------------------------------------------------------
+  # cflinuxfs4
+  - name: install_newrelic_nginx_buildpack_cflinuxfs4
+    type: boolean
+    label: Nginx Extension (cflinuxfs4)?
+    configurable: true
+    default: true
+    description: Install New Relic Nginx Extension Buildpack for cflinuxfs4 (y/n)
+
+  # cflinuxfs3
+  - name: install_newrelic_nginx_buildpack_cflinuxfs3
+    type: boolean
+    label: Nginx Extension (cflinuxfs3)?
+    configurable: true
+    default: true
+    description: Install New Relic Nginx Extension Buildpack for cflinuxfs3 (y/n)
+
+packages:
+# nginx extension - cflinuxfs4
+- name: newrelic_nginx_buildpack_cflinuxfs4
+  buildpack_order: 31
+  type: buildpack
+  label: New Relic Nginx Extension Buildpack for cflinuxfs4
+  path: './build/newrelic_nginx_buildpack-cached-cflinuxfs4-v1.0.1.zip'
+  pre_deploy: |
+
+    function delete_nr_anystack_buildpacks() {
+      $CF buildpacks | egrep -w "^newrelic_nginx_buildpack(_cached)?" | awk '
+          NF == 5 { system("cf delete-buildpack -f " $1) }
+        '
+    }
+
+    function remove_buildpack() {
+      BP_NAME=${1}
+      export BP_STACK=${2}
+
+      echo "removing buildpack ${BP_NAME} stack ${BP_STACK} if it exists..."
+      $CF buildpacks | grep -w "^${BP_NAME}" | awk '
+          ( NF == 6 && $6 == ENVIRON["BP_STACK"] ) {
+            system("cf delete-buildpack -f " $1 " -s " $6)
+            if (retval == 0) {
+              printf("bp %s - stack %s removed.\n", $1, $6)
+            }
+          }
+        '
+    }
+
+    function rename_anystack_buildpack() {
+      BP_NAME=${1}
+      # if buildpack without stack is found rename it
+      echo "searching for ${BP_NAME} for any-stack buildpacks and renaming them if any exists..."
+      $CF buildpacks | grep -w "^${BP_NAME}" |  awk '
+          NF == 5 { 
+            newBuildpackName = sprintf("%s_any_stack", $1)
+            system("cf rename-buildpack " $1 "  " newBuildpackName)
+          }
+        '
+    }
+
+    function add_buildpack() {
+      BP_NAME=${1}
+      BP_FILE=${2}
+      BP_ORDER=${3}
+      BP_STACK=${4}
+
+      $CF buildpacks | grep -w "^${BP_NAME}" | grep -w " ${STACK}" >/dev/null
+      if [ "$?" -eq "0" ]; then
+        echo "updating buildpack ${BP_NAME} stack ${BP_STACK}..."
+        $CF update-buildpack ${BP_NAME} -p ${BP_FILE} -s ${STACK} --enable
+      else
+        echo "creating buildpack ${BP_NAME} stack ${BP_STACK}..."
+        $CF create-buildpack ${BP_NAME} ${BP_FILE} ${BP_ORDER} --enable
+      fi
+    }
+    ### --------------------------------------------------
+
+
+  post_deploy: |
+    output=`$CF apps | tail -1`
+    if [ "$output" == "No apps found" ]; then
+      cf delete-space -f $CF_SPACE
+    fi
+
+    output=`$CF spaces | tail -1`
+    if [ "$output" == "No spaces found" ]; then
+      cf delete-org -f $CF_ORG
+    fi
+    ### --------------------------------------------------
+
+
+  deploy: |
+    # clean up any NR buildpacks with no stacks
+    delete_nr_anystack_buildpacks
+
+    BUILDPACK_NAME="newrelic_nginx_buildpack"
+    STACK=cflinuxfs4
+    if [ ${INSTALL_NEWRELIC_NGINX_BUILDPACK_CFLINUXFS4} == true ]
+    then
+      BUILDPACK_ORDER=<%= Shellwords.escape properties.newrelic_nginx_buildpack_cflinuxfs4.buildpack_order %>
+      PKG_NAME=<%= Shellwords.escape properties.newrelic_nginx_buildpack_cflinuxfs4.name %>
+      BUILDPACK_FILE=${PACKAGE_PATH}/${PKG_NAME}/newrelic_nginx_buildpack-cached-cflinuxfs4-v1.0.1.zip
+
+      #----
+      echo "PKG_NAME: ${PKG_NAME}"
+      echo "BUILDPACK_NAME: ${BUILDPACK_NAME}"
+      echo "BUILDPACK_ORDER: ${BUILDPACK_ORDER}"
+      echo "BUILDPACK_FILE: ${BUILDPACK_FILE}"
+      echo "STACK: ${STACK}"
+      #--------
+
+      add_buildpack ${BUILDPACK_NAME} ${BUILDPACK_FILE} ${BUILDPACK_ORDER} ${STACK}
+    else
+      remove_buildpack ${BUILDPACK_NAME} ${STACK}
+    fi
+    ### --------------------------------------------------
+
+
+  delete: |
+    ### delete the buildpacks
+    cf delete-buildpack -f newrelic_nginx_buildpack -s cflinuxfs4
+    ### --------------------------------------------------
+
+# nginx extension - cflinuxfs3
+- name: newrelic_nginx_buildpack_cflinuxfs3
+  buildpack_order: 32
+  type: buildpack
+  label: New Relic Nginx Extension Buildpack for cflinuxfs3
+  path: './build/newrelic_nginx_buildpack-cached-cflinuxfs3-v1.0.1.zip'
+  pre_deploy: |
+
+    function delete_nr_anystack_buildpacks() {
+      $CF buildpacks | egrep -w "^newrelic_nginx_buildpack(_cached)?" | awk '
+          NF == 5 { system("cf delete-buildpack -f " $1) }
+        '
+    }
+
+    function remove_buildpack() {
+      BP_NAME=${1}
+      export BP_STACK=${2}
+
+      echo "removing buildpack ${BP_NAME} stack ${BP_STACK} if it exists..."
+      $CF buildpacks | grep -w "^${BP_NAME}" | awk '
+          ( NF == 6 && $6 == ENVIRON["BP_STACK"] ) {
+            system("cf delete-buildpack -f " $1 " -s " $6)
+            if (retval == 0) {
+              printf("bp %s - stack %s removed.\n", $1, $6)
+            }
+          }
+        '
+    }
+
+    function rename_anystack_buildpack() {
+      BP_NAME=${1}
+      # if buildpack without stack is found rename it
+      echo "searching for ${BP_NAME} for any-stack buildpacks and renaming them if any exists..."
+      $CF buildpacks | grep -w "^${BP_NAME}" |  awk '
+          NF == 5 { 
+            newBuildpackName = sprintf("%s_any_stack", $1)
+            system("cf rename-buildpack " $1 "  " newBuildpackName)
+          }
+        '
+    }
+
+    function add_buildpack() {
+      BP_NAME=${1}
+      BP_FILE=${2}
+      BP_ORDER=${3}
+      BP_STACK=${4}
+
+      $CF buildpacks | grep -w "^${BP_NAME}" | grep -w " ${STACK}" >/dev/null
+      if [ "$?" -eq "0" ]; then
+        echo "updating buildpack ${BP_NAME} stack ${BP_STACK}..."
+        $CF update-buildpack ${BP_NAME} -p ${BP_FILE} -s ${STACK} --enable
+      else
+        echo "creating buildpack ${BP_NAME} stack ${BP_STACK}..."
+        $CF create-buildpack ${BP_NAME} ${BP_FILE} ${BP_ORDER} --enable
+      fi
+    }
+    ### --------------------------------------------------
+
+
+  post_deploy: |
+    output=`$CF apps | tail -1`
+    if [ "$output" == "No apps found" ]; then
+      cf delete-space -f $CF_SPACE
+    fi
+
+    output=`$CF spaces | tail -1`
+    if [ "$output" == "No spaces found" ]; then
+      cf delete-org -f $CF_ORG
+    fi
+    ### --------------------------------------------------
+
+
+  deploy: |
+    # clean up any NR buildpacks with no stacks
+    delete_nr_anystack_buildpacks
+
+    BUILDPACK_NAME="newrelic_nginx_buildpack"
+    STACK=cflinuxfs3
+    if [ ${INSTALL_NEWRELIC_NGINX_BUILDPACK_CFLINUXFS3} == true ]
+    then
+      BUILDPACK_ORDER=<%= Shellwords.escape properties.newrelic_nginx_buildpack_cflinuxfs3.buildpack_order %>
+      PKG_NAME=<%= Shellwords.escape properties.newrelic_nginx_buildpack_cflinuxfs3.name %>
+      BUILDPACK_FILE=${PACKAGE_PATH}/${PKG_NAME}/newrelic_nginx_buildpack-cached-cflinuxfs3-v1.0.1.zip
+
+      #----
+      echo "PKG_NAME: ${PKG_NAME}"
+      echo "BUILDPACK_NAME: ${BUILDPACK_NAME}"
+      echo "BUILDPACK_ORDER: ${BUILDPACK_ORDER}"
+      echo "BUILDPACK_FILE: ${BUILDPACK_FILE}"
+      echo "STACK: ${STACK}"
+      #--------
+
+      add_buildpack ${BUILDPACK_NAME} ${BUILDPACK_FILE} ${BUILDPACK_ORDER} ${STACK}
+    else
+      remove_buildpack ${BUILDPACK_NAME} ${STACK}
+    fi
+    ### --------------------------------------------------
+
+
+  delete: |
+    ### delete the buildpacks
+    cf delete-buildpack -f newrelic_nginx_buildpack -s cflinuxfs3
+    ### --------------------------------------------------

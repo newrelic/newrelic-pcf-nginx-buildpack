@@ -1,0 +1,13 @@
+applications:
+  - name: my-app-test3
+    memory: 1G
+    disk_quota: 512M
+    buildpacks:
+      - nginx_buildpack
+      - newrelic_nginx_buildpack
+    env:
+      NGINX_VERSION: 1.25.5
+      STATUS_PORT: 8080
+      NRIA_LOG_LEVEL: info
+      NRIA_LOG_STDOUT: true
+

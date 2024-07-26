@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+export GOOS=linux
+export GOARCH=amd64
+
+set -e
+set -u
+set -o pipefail
+
+ROOTDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+readonly ROOTDIR
+
+echo "Root directory: ${ROOTDIR}"
+
+# shellcheck source=SCRIPTDIR/.util/tools.sh
+source "${ROOTDIR}/scripts/.util/tools.sh"
+
+function main() {
+  local src
+  src="$(find "${ROOTDIR}/cmd" -mindepth 1 -maxdepth 1 -type d )"
+  echo "Source directories: ${src}"
+
+  util::tools::jq::install --directory "${ROOTDIR}/.bin"
+
+  IFS=" " read -r -a oses <<< "$(jq -r -S '.oses[]' "${ROOTDIR}/config.json" | xargs)"
+  echo "Operating systems: ${oses[*]}"
+
+  IFS=" " read -r -a binaries <<< "$(find "${src}" -name cli -type d -print0 | xargs -0)"
+  echo "Binaries to build: ${binaries[*]}"
+
+  for os in "${oses[@]}"; do
+    for path in "${binaries[@]}"; do
+      local name output
+      name="$(basename "$(dirname "${path}")")"
+      output="${ROOTDIR}/bin/${name}"
+
+      if [[ "${os}" == "windows" ]]; then
+        output="${output}.exe"
+      fi
+
+      echo "Building for OS: ${os}, Binary: ${path}, Output: ${output}"
+
+      echo "Compiling the following Go files:"
+      find "${path}" -name '*.go' -print
+
+      CGO_ENABLED=0 \
+      GOOS="${os}" \
+        go build \
+          -mod vendor \
+          -ldflags="-s -w" \
+          -o "${output}" \
+            "${path}"
+
+      echo "Built ${output}"
+    done
+  done
+}
+
+main "${@:-}"
+
