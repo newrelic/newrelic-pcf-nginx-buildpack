@@ -22,8 +22,9 @@
 
 The New Relic Nginx Integration Buildpack for VMware Tanzu enables seamless monitoring and troubleshooting of your NGINX server. This buildpack collects and sends comprehensive data, including inventory and metrics, to the New Relic platform. This integration provides valuable insights into connections and client requests, allowing for quick issue identification and resolution. Additionally, you can correlate this data with VMware Tanzu infrastructure metrics and events collected by the [New Relic Firehose Nozzle](https://support.broadcom.com/group/ecx/productdownloads?subfamily=New%20Relic%20Nozzle%20for%20VMware%20Tanzu), gaining a complete understanding of your environment and streamlining your troubleshooting process.
 
+## Prerequisites [#prereqs]
 
-### Requirements
+This product has been tested and is compatible with VMware Tanzu OpsManager versions up to and including v3.0 and Tanzu Application Service 5.0 and 6.0.
 
 The New Relic Nginx Integration Buildpack for VMware Tanzu requires the following:
 
@@ -33,41 +34,57 @@ The New Relic Nginx Integration Buildpack for VMware Tanzu requires the followin
 
 For general information about adding multiple buildpacks to manifests, see [Pushing an Application with Multiple Buildpacks](https://docs.cloudfoundry.org/buildpacks/use-multiple-buildpacks.html) in the Cloud Foundry documentation.
 
-Here's the table converted for a ReadMe.md file using Markdown:
-
----
-
-## Version and Support Information
+## Version and Support Information [#version-and-support]
 
 The following table provides version and version-support information about the New Relic Nginx Integration Buildpack for VMware Tanzu.
 
-| Element | Details |
-|---------|---------|
-| **Tile version** | 1.0.1 |
-| **Release date** | July 31, 2024 |
-| **Software component version** | New Relic Nginx Integration Buildpack for VMware Tanzu 1.0.1 |
-| **VMware Tanzu OpsManager** | 3.0.x |
-| **Tanzu Application Service** | 5.0.x and 6.0.x |
-| **BOSH stemcell version** | Ubuntu Jammy |
-| **CF Stack** | cflinuxfs3, cflinuxfs4 |
+<table>
+    <thead>
+        <tr>
+            <th>Element</th>
+            <th>Details</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Tile version</td>
+            <td>1.0.1</td>
+        </tr>
+        <tr>
+            <td>Release date</td>
+            <td>July 31, 2024</td>
+        </tr>
+        <tr>
+            <td>Software component version</td>
+            <td>New Relic Nginx Integration Buildpack for VMware Tanzu 1.0.1</td>
+        </tr>
+        <tr>
+            <td>Compatible Ops Manager version(s)</td>
+            <td>3.0.x</td>
+        </tr>
+        <tr>
+            <td>Compatible VMware Tanzu Application Service for VMs versions</td>
+            <td>5.0.x and 6.0.x</td>
+        </tr>
+        <tr>
+            <td>BOSH stemcell version</td>
+            <td>Ubuntu Jammy</td>
+        </tr>
+        <tr>
+            <td>CF Stack</td>
+            <td>cflinuxfs3, cflinuxfs4</td>
+        </tr>
+    </tbody>
+</table>
 
----
-
-## Feedback [#feedback]
-
-If you have a feature request, questions, or information about a bug, please submit an issue on [github](https://github.com/newrelic/newrelic-nginx-buildpack-tile/issues).
-
----
-
-
-## Installation and Configuration
+## Installation and Configuration [#install]
 
 This section describes how to install and configure the New Relic Nginx Integration Buildpack for VMware Tanzu.
 
 You can install the buildpacks either as a tile in Ops Manager or individually using the CF CLI.
 
-### <a id='install-opsmgr'></a> Install and Configure New Relic Nginx Integration Buildpack as a Tile in Ops Manager
----
+### Install and Configure New Relic Nginx Integration Buildpack as a Tile in Ops Manager
+
 1. Download the latest version of the tile (currently **"newrelic-nginx-buildpack-1.0.1.pivotal"**) from the [Broadcom download site](https://support.broadcom.com/group/ecx/productdownloads?subfamily=New%20Relic%20Nginx%20Integration%20Buildpack%20for%20VMware%20Tanzu), or from New Relic's [GitHub repo under releases](https://github.com/newrelic/newrelic-pcf-nginx-buildpack/releases).
 2. Navigate to the Ops Manager Installation Dashboard and click **Import a Product** to upload the product file.
 3. Under the **Import a Product** button, click the **"+"** sign next to the version number of **New Relic Nginx Buildpack for Tanzu** to add the tile to your staging area.
@@ -77,13 +94,14 @@ You can install the buildpacks either as a tile in Ops Manager or individually u
 7. Go to the **Installation UI** of Ops Manager.
 8. Click the blue button in the top-right corner of the Installation UI to **Apply changes**.
 
-### <a id='install-buildpack'></a> Install and Configure Nginx Buildpack for Tanzu with CF CLI
----
+
+### Install and Configure Nginx Buildpack for Tanzu with CF CLI
+
 If you prefer not to install the tile, you can alternatively unzip the downloaded **.pivotal** file and install the buildpacks using the CF CLI command **"cf create-buildpack ..."**.
 
 1. Unzip **"newrelic-nginx-buildpack-*.pivotal"** into a separate subdirectory:
     ```sh
-    unzip newrelic-nginx-buildpack-*.pivotal -d buildpack_tile
+    unzip newrelic-pcf-nginx-buildpack-*.pivotal -d buildpack_tile
     ```
 2. Change directory to `buildpack_tile/releases`:
     ```sh
@@ -95,7 +113,7 @@ If you prefer not to install the tile, you can alternatively unzip the downloade
     ```
 4. Extract the **.tgz** file in the releases folder into the **tmp** directory:
     ```sh
-    tar xvf newrelic-nginx-buildpack-*.tgz -C tmp
+    tar xvf newrelic-pcf-nginx-buildpack-*.tgz -C tmp
     ```
 5. Change directory to **tmp/packages**:
     ```sh
@@ -113,17 +131,17 @@ If you prefer not to install the tile, you can alternatively unzip the downloade
 
 7. Upload the zipped buildpack file using the CF CLI's **"cf create-buildpack"** command:
     ```sh
-    cf create-buildpack newrelic_nginx_buildpack newrelic_nginx_buildpack-cached-cflinuxfs4-v*.zip 99
+    cf create-buildpack newrelic_nginx_buildpack-local newrelic_nginx_buildpack_cflinuxfs4/newrelic_nginx_buildpack-cached-cflinuxfs4-v*.zip 99
     ```
     OR
     ```sh
-    cf create-buildpack newrelic_nginx_buildpack newrelic_nginx_buildpack-cached-cflinuxfs3-v*.zip 99
+    cf create-buildpack newrelic_nginx_buildpack-local newrelic_nginx_buildpack_cflinuxfs3/newrelic_nginx_buildpack-cached-cflinuxfs3-v*.zip 99
     ```
 
-## <a id='buildpack-build-deploy'></a> Buildpack Build and Deploy Process
+## Buildpack Build and Deploy Process [#buildpack-build-deploy]
 
-### <a id='build'></a> Build
----
+### Build [#build]
+
 The buildpacks in this tile are pre-built and ready for use in Cloud Foundry. However, if you want to make changes or update the cached version of any buildpacks with newer dependencies, you can build your own copy. Follow the instructions below to build your own copy:
 
 1. Clone the buildpack repository to your system:
@@ -160,8 +178,8 @@ The buildpacks in this tile are pre-built and ready for use in Cloud Foundry. Ho
    Following tile will be generated:
    - product/newrelic-pcf-nginx-buildpack-*.pivotal
 
-### <a id='deploy'></a> Deploy
----
+### Deploy [#deploy]
+
 To deploy and use the buildpack in Cloud Foundry:
 
 1. Upload the buildpack to Cloud Foundry and optionally specify it by name using the CF CLI:
@@ -175,8 +193,8 @@ To deploy and use the buildpack in Cloud Foundry:
     wget https://github.com/newrelic/newrelic-pcf-nginx-buildpack/releases/example.zip
     ```
 
-### Example Directory
----
+## Example Directory [#example-app-artifacts]
+
 The `example` directory contains various artifacts necessary for the buildpack. Below is a description of each artifact and related documentation for reference:
 
 ```
@@ -190,7 +208,7 @@ example/
     └── index.html
 ```
 
-#### Artifacts Description:
+### Artifacts Description:
 
 - **[buildpack.yml](https://docs.cloudfoundry.org/buildpacks/nginx/index.html):**
   - Contains configuration for the buildpack.
@@ -234,7 +252,7 @@ Finally, push the application using the `cf push` command by using the manifest.
     cf push
     ```
 
-### Optional: Binding Your Application to New Relic Broker Service
+### Optional: Binding Your Application to New Relic Broker Service [#binding-with-nerelic-broker-service]
 ---
 To integrate your application with the [New Relic Broker Service](https://docs.newrelic.com/docs/infrastructure/host-integrations/host-integrations-list/cloudfoundry-integrations/vmware-tanzu-service-broker-integration/), follow these steps:
 
@@ -265,15 +283,25 @@ To integrate your application with the [New Relic Broker Service](https://docs.n
     cf push
     ```
 
-### Monitoring with New Relic
+## Monitoring with New Relic [#monitoring]
 ---
 Once the application is successfully pushed, the New Relic Nginx integration will start sending NGINX metrics to New Relic.
 
 To install the dashboard, click [here](https://one.newrelic.com/catalog-pack-details?state=952adb8f-8cd8-17ec-a55e-2a470ff27b54). You should skip the installation and directly install the dashboard.
 
-<img width="962" alt="image" src="https://github.com/user-attachments/assets/bb88156c-4e9f-4ad1-80dd-da2778ed57fa">
+![New Relic Dashboard](https://github.com/user-attachments/assets/bb88156c-4e9f-4ad1-80dd-da2778ed57fa)
 
 You may also explore data further under "All entities" → "On Hosts" → "NGINX Servers."
+
+<Callout variant="important">
+    The cached version of this integration buildpack contains New Relic Infrastructure Agent `1.53.0` and New Relic Nginx Integration `3.4.6`.
+</Callout>
+
+## Feedback [#feedback]
+---
+If you have a feature request, questions, or information about a bug, please submit an issue on [GitHub](https://github.com/newrelic/newrelic-pcf-nginx-buildpack/issues).
+
+
 
 ---
 ## Support
@@ -294,7 +322,7 @@ If you believe you have found a security vulnerability in this project or any of
 
 ## License
 
-New Relic Java Instrumentation for RMI is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.
+New Relic Nginx Integration Buildpack for VMware Tanzu is licensed under the [Apache 2.0](http://apache.org/licenses/LICENSE-2.0.txt) License.
 
 >[If applicable: [Project Name] also uses source code from third-party libraries. You can find full details on which libraries are used and the terms under which they are licensed in the third-party notices document.]
 
