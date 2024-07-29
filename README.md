@@ -186,11 +186,11 @@ To deploy and use the buildpack in Cloud Foundry:
     ```sh
     cf create-buildpack newrelic_nginx_buildpack [BUILDPACK_ZIP_FILE_PATH] 99
     ```
-2. Create a folder named `example` and download the `example.zip` archive:
+2. Create a folder named `example` and download the `example.tar.gz` archive:
     ```sh
     mkdir example
     cd example
-    wget https://github.com/newrelic/newrelic-pcf-nginx-buildpack/releases/example.zip
+    wget https://github.com/newrelic/newrelic-pcf-nginx-buildpack/releases/download/v1.0.1/example.tar.gz
     ```
 
 ## Example Directory [#example-app-artifacts]
