@@ -1,0 +1,7 @@
+nginx:
+  version: mainline
+newrelic-infra:
+  version: 1.53.0
+newrelic-nginx:
+  version: 3.4.6
+
