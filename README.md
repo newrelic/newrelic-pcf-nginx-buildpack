@@ -48,7 +48,7 @@ The following table provides version and version-support information about the N
     <tbody>
         <tr>
             <td>Tile version</td>
-            <td>1.0.1</td>
+            <td>1.0.2</td>
         </tr>
         <tr>
             <td>Release date</td>
