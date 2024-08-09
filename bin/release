@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# bin/release <build-dir>
+
+# Ensure the script fails on any errors
+set -e
+
+# Output the YAML directly
+cat << EOF
+---
+default_process_types:
+  web: varify -buildpack-yml-path ./buildpack.yml ./nginx.conf "\$HOME/modules" "\$DEP_DIR/nginx/modules" && nginx -p "\$PWD" -c ./nginx.conf
+
+config_vars:
+  NEW_RELIC_LICENSE_KEY: "${NEW_RELIC_LICENSE_KEY}"
+  NR_INSTALL_SILENT: true
+EOF

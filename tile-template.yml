@@ -34,7 +34,7 @@ forms:
 packages:
 # nginx extension - cflinuxfs4
 - name: newrelic_nginx_buildpack_cflinuxfs4
-  buildpack_order: 31
+  buildpack_order: 32
   type: buildpack
   label: New Relic Nginx Extension Buildpack for cflinuxfs4
   path: './build/newrelic_nginx_buildpack-{{ cached_suffix }}-cflinuxfs4-v{{ version }}.zip'
@@ -138,7 +138,7 @@ packages:
 
 # nginx extension - cflinuxfs3
 - name: newrelic_nginx_buildpack_cflinuxfs3
-  buildpack_order: 32
+  buildpack_order: 31
   type: buildpack
   label: New Relic Nginx Extension Buildpack for cflinuxfs3
   path: './build/newrelic_nginx_buildpack-{{ cached_suffix }}-cflinuxfs3-v{{ version }}.zip'
