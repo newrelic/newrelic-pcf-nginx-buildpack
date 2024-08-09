@@ -30,7 +30,7 @@ build:
 clean:
 	rm -rf ./build/*.zip
 	rm -f ./bin/finalize
-	rm -f ./bin/verify
+	rm -f ./bin/varify
 	rm -f ./bin/supply
 	rm -rf ./product
 	rm -rf ./release

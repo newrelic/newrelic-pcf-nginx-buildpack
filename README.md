@@ -24,7 +24,7 @@ The New Relic Nginx Integration Buildpack for VMware Tanzu enables seamless moni
 
 ## Prerequisites [#prereqs]
 
-This product has been tested and is compatible with VMware Tanzu OpsManager versions up to and including v3.0 and Tanzu Application Service 5.0 and 6.0.
+This product has been tested and is compatible with VMware Tanzu OpsManager versions up to and including v3.0 and Tanzu Application Service 4.0, 5.0 and 6.0.
 
 The New Relic Nginx Integration Buildpack for VMware Tanzu requires the following:
 
@@ -52,11 +52,11 @@ The following table provides version and version-support information about the N
         </tr>
         <tr>
             <td>Release date</td>
-            <td>July 31, 2024</td>
+            <td>August 09, 2024</td>
         </tr>
         <tr>
             <td>Software component version</td>
-            <td>New Relic Nginx Integration Buildpack for VMware Tanzu 1.0.1</td>
+            <td>New Relic Nginx Integration Buildpack for VMware Tanzu 1.0.2</td>
         </tr>
         <tr>
             <td>Compatible Ops Manager version(s)</td>
@@ -64,7 +64,7 @@ The following table provides version and version-support information about the N
         </tr>
         <tr>
             <td>Compatible VMware Tanzu Application Service for VMs versions</td>
-            <td>5.0.x and 6.0.x</td>
+            <td>4.0.x, 5.0.x and 6.0.x</td>
         </tr>
         <tr>
             <td>BOSH stemcell version</td>
@@ -85,7 +85,7 @@ You can install the buildpacks either as a tile in Ops Manager or individually u
 
 ### Install and Configure New Relic Nginx Integration Buildpack as a Tile in Ops Manager
 
-1. Download the latest version of the tile (currently **"newrelic-nginx-buildpack-1.0.1.pivotal"**) from the [Broadcom download site](https://support.broadcom.com/group/ecx/productdownloads?subfamily=New%20Relic%20Nginx%20Integration%20Buildpack%20for%20VMware%20Tanzu), or from New Relic's [GitHub repo under releases](https://github.com/newrelic/newrelic-pcf-nginx-buildpack/releases).
+1. Download the latest version of the tile (currently **"newrelic-nginx-buildpack-1.0.2.pivotal"**) from the [Broadcom download site](https://support.broadcom.com/group/ecx/productdownloads?subfamily=New%20Relic%20Nginx%20Integration%20Buildpack%20for%20VMware%20Tanzu), or from New Relic's [GitHub repo under releases](https://github.com/newrelic/newrelic-pcf-nginx-buildpack/releases).
 2. Navigate to the Ops Manager Installation Dashboard and click **Import a Product** to upload the product file.
 3. Under the **Import a Product** button, click the **"+"** sign next to the version number of **New Relic Nginx Buildpack for Tanzu** to add the tile to your staging area.
 4. Click the newly added **New Relic Nginx Buildpack for Tanzu** tile.
@@ -190,7 +190,7 @@ To deploy and use the buildpack in Cloud Foundry:
     ```sh
     mkdir example
     cd example
-    wget https://github.com/newrelic/newrelic-pcf-nginx-buildpack/releases/download/v1.0.1/example.tar.gz
+    wget https://github.com/newrelic/newrelic-pcf-nginx-buildpack/releases/download/v1.0.2/example.tar.gz
     ```
 
 ## Example Directory [#example-app-artifacts]
