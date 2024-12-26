@@ -392,7 +392,7 @@ func (s *Supplier) Setup() error {
 		}
 	}
 
-	// Load version lines and default versions from manifest.yml
+	// Load version lines from manifest.yml
 	var manifest struct {
 		DefaultVersions []struct {
 			Name    string `yaml:"name"`
@@ -409,19 +409,28 @@ func (s *Supplier) Setup() error {
 	s.DefaultVersions = make(map[string]string)
 	for _, dv := range manifest.DefaultVersions {
 		s.DefaultVersions[dv.Name] = dv.Version
-		// Debug message for default version values
 		s.Log.Debug(fmt.Sprintf("Loaded default version for %s: %s", dv.Name, dv.Version))
 	}
 
-	// Apply default versions if version lines are missing
-	if _, ok := s.VersionLinesInfraConfig["mainline"]; !ok {
-		s.VersionLinesInfraConfig = map[string]string{"mainline": s.DefaultVersions["newrelic-infra"]}
-		s.Log.Debug(fmt.Sprintf("Default Infra Mainline Version applied: %s", s.VersionLinesInfraConfig["mainline"]))
+	// Initialize version lines for each product
+	if infraConfig, ok := manifest.VersionLines["newrelic-infra"]; ok {
+		s.VersionLinesInfraConfig = infraConfig
+		s.Log.Debug(fmt.Sprintf("Original Infra Mainline Version: %s", s.VersionLinesInfraConfig["mainline"]))
+		// Apply default versions for newrelic-infra if not specified
+		if s.Config.Infra.Version == "" {
+			s.VersionLinesInfraConfig = map[string]string{"mainline": s.DefaultVersions["newrelic-infra"]}
+			s.Log.Debug(fmt.Sprintf("Default newrelic-infra version applied: %s", s.VersionLinesInfraConfig["mainline"]))
+		}
 	}
 
-	if _, ok := s.VersionLinesNginxConfig["mainline"]; !ok {
-		s.VersionLinesNginxConfig = map[string]string{"mainline": s.DefaultVersions["newrelic-nginx"]}
-		s.Log.Debug(fmt.Sprintf("Default Nginx Mainline Version applied: %s", s.VersionLinesNginxConfig["mainline"]))
+	if nginxConfig, ok := manifest.VersionLines["newrelic-nginx"]; ok {
+		s.VersionLinesNginxConfig = nginxConfig
+		s.Log.Debug(fmt.Sprintf("Original Nginx Mainline Version: %s", s.VersionLinesNginxConfig["mainline"]))
+		// Apply default versions for newrelic-nginx if not specified
+		if s.IntConfig.Nginx.Version == "" {
+			s.VersionLinesNginxConfig = map[string]string{"mainline": s.DefaultVersions["newrelic-nginx"]}
+			s.Log.Debug(fmt.Sprintf("Default newrelic-nginx version applied: %s", s.VersionLinesNginxConfig["mainline"]))
+		}
 	}
 
 	// Debug output to verify correct parsing
