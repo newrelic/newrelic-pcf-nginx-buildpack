@@ -67,14 +67,16 @@ type NginxConfig struct {
 }
 
 type Supplier struct {
-	Stager       Stager
-	Manifest     Manifest
-	Installer    Installer
-	Log          *libbuildpack.Logger
-	Config       Config
-	IntConfig    IntConfig
-	Command      Command
-	VersionLines map[string]string
+	Stager                  Stager
+	Manifest                Manifest
+	Installer               Installer
+	Log                     *libbuildpack.Logger
+	Config                  Config
+	IntConfig               IntConfig
+	Command                 Command
+	DefaultVersions         map[string]string
+	VersionLinesInfraConfig map[string]string
+	VersionLinesNginxConfig map[string]string
 }
 
 func New(stager Stager, manifest Manifest, installer Installer, logger *libbuildpack.Logger, command Command) *Supplier {
@@ -244,7 +246,7 @@ func (s *Supplier) InstallNewRelicNginx() error {
 
 	dep, err := s.findMatchingVersion("newrelic-nginx", s.IntConfig.Nginx.Version)
 	if err != nil {
-		s.Log.Info(`Available versions: ` + strings.Join(s.availableVersions(), ", "))
+		s.Log.Info(`Available versions: ` + strings.Join(s.availableVersionsNginxIntegration(), ", "))
 		return fmt.Errorf("Could not determine version: %s", err)
 	}
 	if s.IntConfig.Nginx.Version == "" {
@@ -274,7 +276,7 @@ func (s *Supplier) InstallNewRelicAgent() error {
 
 	dep, err := s.findMatchingVersion("newrelic-infra", s.Config.Infra.Version)
 	if err != nil {
-		s.Log.Info(`Available versions: ` + strings.Join(s.availableVersions(), ", "))
+		s.Log.Info(`Available versions: ` + strings.Join(s.availableVersionsInfraAgent(), ", "))
 		return fmt.Errorf("Could not determine version: %s", err)
 	}
 	if s.Config.Infra.Version == "" {
@@ -389,6 +391,42 @@ func (s *Supplier) Setup() error {
 			return err
 		}
 	}
+
+	// Load version lines and default versions from manifest.yml
+	var manifest struct {
+		DefaultVersions []struct {
+			Name    string `yaml:"name"`
+			Version string `yaml:"version"`
+		} `yaml:"default_versions"`
+		VersionLines map[string]map[string]string `yaml:"version_lines"`
+	}
+	manifestPath := filepath.Join(s.Manifest.RootDir(), "manifest.yml")
+	if err := libbuildpack.NewYAML().Load(manifestPath, &manifest); err != nil {
+		return err
+	}
+
+	// Initialize default versions map
+	s.DefaultVersions = make(map[string]string)
+	for _, dv := range manifest.DefaultVersions {
+		s.DefaultVersions[dv.Name] = dv.Version
+		// Debug message for default version values
+		s.Log.Debug(fmt.Sprintf("Loaded default version for %s: %s", dv.Name, dv.Version))
+	}
+
+	// Apply default versions if version lines are missing
+	if _, ok := s.VersionLinesInfraConfig["mainline"]; !ok {
+		s.VersionLinesInfraConfig = map[string]string{"mainline": s.DefaultVersions["newrelic-infra"]}
+		s.Log.Debug(fmt.Sprintf("Default Infra Mainline Version applied: %s", s.VersionLinesInfraConfig["mainline"]))
+	}
+
+	if _, ok := s.VersionLinesNginxConfig["mainline"]; !ok {
+		s.VersionLinesNginxConfig = map[string]string{"mainline": s.DefaultVersions["newrelic-nginx"]}
+		s.Log.Debug(fmt.Sprintf("Default Nginx Mainline Version applied: %s", s.VersionLinesNginxConfig["mainline"]))
+	}
+
+	// Debug output to verify correct parsing
+	s.Log.Debug(fmt.Sprintf("Infra Mainline Version: %s", s.VersionLinesInfraConfig["mainline"]))
+	s.Log.Debug(fmt.Sprintf("Nginx Mainline Version: %s", s.VersionLinesNginxConfig["mainline"]))
 
 	s.Log.Info("Checking for nginx_buildpack installation...")
 
@@ -682,11 +720,27 @@ func (s *Supplier) validateNGINXConfSyntax() error {
 	return nil
 }
 
-func (s *Supplier) availableVersions() []string {
-	allVersions := s.Manifest.AllDependencyVersions("nginx")
+func (s *Supplier) availableVersionsInfraAgent() []string {
+	allVersions := s.Manifest.AllDependencyVersions("newrelic-infra")
 	allNames := []string{}
 	allSemver := []string{}
-	for k, v := range s.VersionLines {
+	for k, v := range s.VersionLinesInfraConfig {
+		if k != "" {
+			allNames = append(allNames, k)
+			allSemver = append(allSemver, v)
+		}
+	}
+	sort.Strings(allNames)
+	sort.Strings(allSemver)
+
+	return append(append(allNames, allSemver...), allVersions...)
+}
+
+func (s *Supplier) availableVersionsNginxIntegration() []string {
+	allVersions := s.Manifest.AllDependencyVersions("newrelic-nginx")
+	allNames := []string{}
+	allSemver := []string{}
+	for k, v := range s.VersionLinesNginxConfig {
 		if k != "" {
 			allNames = append(allNames, k)
 			allSemver = append(allSemver, v)
@@ -700,16 +754,30 @@ func (s *Supplier) availableVersions() []string {
 
 func (s *Supplier) findMatchingVersion(depName string, version string) (libbuildpack.Dependency, error) {
 	s.Log.Debug("nr-labs - Inside findMatchingVersion")
-	if version == "" {
-		if val, ok := s.VersionLines["mainline"]; ok {
+	if depName == "newrelic-infra" {
+		if version == "" {
+			if val, ok := s.VersionLinesInfraConfig["mainline"]; ok {
+				version = val
+				s.Log.Debug("nr-labs - mainline")
+			} else {
+				return libbuildpack.Dependency{}, fmt.Errorf("Could not find mainline version line in buildpack manifest to default to")
+			}
+		} else if val, ok := s.VersionLinesInfraConfig[version]; ok {
+			s.Log.Debug("nr-labs  - mainline -1 " + val)
 			version = val
-			s.Log.Debug("nr-labs - mainline")
-		} else {
-			return libbuildpack.Dependency{}, fmt.Errorf("Could not find mainline version line in buildpack manifest to default to")
 		}
-	} else if val, ok := s.VersionLines[version]; ok {
-		s.Log.Debug("nr-labs  - mainline -1 " + val)
-		version = val
+	} else if depName == "newrelic-nginx" {
+		if version == "" {
+			if val, ok := s.VersionLinesNginxConfig["mainline"]; ok {
+				version = val
+				s.Log.Debug("nr-labs - mainline")
+			} else {
+				return libbuildpack.Dependency{}, fmt.Errorf("Could not find mainline version line in buildpack manifest to default to")
+			}
+		} else if val, ok := s.VersionLinesNginxConfig[version]; ok {
+			s.Log.Debug("nr-labs  - mainline -1 " + val)
+			version = val
+		}
 	}
 
 	versions := s.Manifest.AllDependencyVersions(depName)
@@ -726,12 +794,13 @@ func (s *Supplier) findMatchingVersion(depName string, version string) (libbuild
 	return libbuildpack.Dependency{Name: depName, Version: version}, nil
 }
 
-func (s *Supplier) isStableLine(version string) bool {
-	stableLine := s.VersionLines["stable"]
-	_, err := libbuildpack.FindMatchingVersion(stableLine, []string{version})
-	return err == nil
-}
-
+/*
+	func (s *Supplier) isStableLine(version string) bool {
+		stableLine := s.VersionLines["stable"]
+		_, err := libbuildpack.FindMatchingVersion(stableLine, []string{version})
+		return err == nil
+	}
+*/
 func GetIncludedConfs(str string) []string {
 	includeFiles := []string{}
 	includeRe := regexp.MustCompile(`include\s+([-.\w\/]+\.conf);`)

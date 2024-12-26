@@ -9,4 +9,4 @@ applications:
       STATUS_PORT: 8080
       NRIA_LOG_LEVEL: info
       NRIA_LOG_STDOUT: true
-    stack: cflinuxfs3
+    stack: cflinuxfs4
