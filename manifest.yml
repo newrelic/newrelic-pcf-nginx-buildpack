@@ -7,10 +7,9 @@ default_versions:
   version: 3.4.6
 version_lines:
   newrelic-infra:
-    mainline: 1.53.0
+    mainline: 1.59.0
   newrelic-nginx:
-    mainline: 3.4.6
-dependency_deprecation_dates:
+    mainline: 3.5.0
 dependencies:
 - name: newrelic-infra
   version: 1.53.0
@@ -19,10 +18,24 @@ dependencies:
   cf_stacks:
   - cflinuxfs3
   - cflinuxfs4
+- name: newrelic-infra
+  version: 1.59.0
+  uri: https://download.newrelic.com/infrastructure_agent/binaries/linux/amd64/newrelic-infra_linux_1.59.0_amd64.tar.gz
+  sha256: 17fd1fcd289d3cfa391d5eda0b24b9470e19c2ed8245fb2ee1fbf33c645eee09
+  cf_stacks:
+  - cflinuxfs3
+  - cflinuxfs4
 - name: newrelic-nginx
   version: 3.4.6
   uri: https://download.newrelic.com/infrastructure_agent/binaries/linux/amd64/nri-nginx_linux_3.4.6_amd64.tar.gz
   sha256: 6938f360b3ba35986363e225a4cb33b06da253230caaf54c5ff691c85732c9c5
+  cf_stacks:
+  - cflinuxfs3
+  - cflinuxfs4
+- name: newrelic-nginx
+  version: 3.5.0
+  uri: https://download.newrelic.com/infrastructure_agent/binaries/linux/amd64/nri-nginx_linux_3.5.0_amd64.tar.gz
+  sha256: bcdeef3a20be618f1a8ffe886df294ee9d21c43b99b905f876d7a78d1affcd78
   cf_stacks:
   - cflinuxfs3
   - cflinuxfs4
@@ -37,4 +50,3 @@ include_files:
 - bin/release
 - bin/varify
 - manifest.yml
-
