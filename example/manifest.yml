@@ -4,7 +4,7 @@ applications:
   disk_quota: 512M
   buildpacks:
   - nginx_buildpack
-  - Gulab-BuildPack-NR
+  - newrelic_nginx_buildpack
   env:
     STATUS_PORT: 8080
     NRIA_LOG_LEVEL: info
