@@ -1,6 +1,6 @@
 module github.com/newrelic-experimental/newrelic-pcf-nginx-buildpack
 
-go 1.19
+go 1.23
 
 require (
 	github.com/cloudfoundry/libbuildpack v0.0.0-20231211162543-86d10e150195
